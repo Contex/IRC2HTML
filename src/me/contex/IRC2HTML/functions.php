@@ -32,6 +32,23 @@ function parseToHTML($string) {
 	return $string;
 }
 
+function parseToBBCode($string) {
+	$string = str_replace(chr(2), "[b]", $string);
+	$string = str_replace(chr(29), "[i]", $string);
+	$string = str_replace(chr(15), "[/bg][/color][/i][/b]", $string);
+	for($a = 15; $a >= 0; $a--) {
+		for($b = 15; $b >= 0; $b--) {
+			if ($a == 0) {
+				$string = str_replace(chr(3) . '0' . $b, "[/color][color=" . getHTMLColor($b) . "]", $string);
+				$string = str_replace(chr(3) . $b, "[/color][color=" . getHTMLColor($b) . "]", $string);
+			} else {
+				$string = str_replace(chr(3) . $a . ',' . $b, "[/bg][/color][color=" . getHTMLColor($b) . "][bg=" . getHTMLColor($a) . "]", $string);
+			}
+		}
+	}
+	return $string;
+}
+
 function parseToIRC($string) {
 	$string = str_replace("</font></i></b>", chr(15), $string);
 	$string = str_replace("</font>", chr(3), $string);
@@ -43,6 +60,28 @@ function parseToIRC($string) {
 }
 
 function getHTMLColor($id) {
+	switch($id) {
+		case 0: 	return "white";
+		case 1: 	return "black";
+		case 2: 	return "darkblue";
+		case 3: 	return "green";
+		case 4: 	return "red";
+		case 5: 	return "brown";
+		case 6: 	return "purple";
+		case 7: 	return "orange";
+		case 8: 	return "yellow";
+		case 9: 	return "lime";
+		case 10: 	return "teal";
+		case 11: 	return "teal";
+		case 12: 	return "blue";
+		case 13: 	return "pink";
+		case 14: 	return "grey";
+		case 15: 	return "lightgrey";
+	}
+	return "white";
+}
+
+function getBBCodeColor($id) {
 	switch($id) {
 		case 0: 	return "white";
 		case 1: 	return "black";
