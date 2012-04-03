@@ -39,10 +39,10 @@ function parseToBBCode($string) {
 	for($a = 15; $a >= 0; $a--) {
 		for($b = 15; $b >= 0; $b--) {
 			if ($a == 0) {
-				$string = str_replace(chr(3) . '0' . $b, "[/color][color=" . getHTMLColor($b) . "]", $string);
-				$string = str_replace(chr(3) . $b, "[/color][color=" . getHTMLColor($b) . "]", $string);
+				$string = str_replace(chr(3) . '0' . $b, "[/color][color=" . getBBCodeColor($b) . "]", $string);
+				$string = str_replace(chr(3) . $b, "[/color][color=" . getBBCodeColor($b) . "]", $string);
 			} else {
-				$string = str_replace(chr(3) . $a . ',' . $b, "[/bg][/color][color=" . getHTMLColor($b) . "][bg=" . getHTMLColor($a) . "]", $string);
+				$string = str_replace(chr(3) . $a . ',' . $b, "[/bg][/color][color=" . getBBCodeColor($b) . "][bg=" . getBBCodeColor($a) . "]", $string);
 			}
 		}
 	}
