@@ -14,6 +14,12 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * chr(2) = 	bold
+ * chr(3) =    	color
+ * chr(15) = 	clean 
+ * chr(29) = 	italic
  */
 function parseToHTML($string) {
 	$string = str_replace(chr(2), "<b>", $string);
@@ -33,19 +39,66 @@ function parseToHTML($string) {
 }
 
 function parseToBBCode($string) {
-	$string = str_replace(chr(2), "[b]", $string);
-	$string = str_replace(chr(29), "[i]", $string);
-	$string = str_replace(chr(15), "[/bg][/color][/i][/b]", $string);
 	for($a = 15; $a >= 0; $a--) {
 		for($b = 15; $b >= 0; $b--) {
 			if ($a == 0) {
-				$string = str_replace(chr(3) . '0' . $b, "[/color][color=" . getBBCodeColor($b) . "]", $string);
-				$string = str_replace(chr(3) . $b, "[/color][color=" . getBBCodeColor($b) . "]", $string);
+				$string = str_replace(chr(3) . '0' . $b, "[color=" . getBBCodeColor($b) . "]", $string);
+				$string = str_replace(chr(3) . $b, "[color=" . getBBCodeColor($b) . "]", $string);
 			} else {
-				$string = str_replace(chr(3) . $a . ',' . $b, "[/bg][/color][color=" . getBBCodeColor($b) . "][bg=" . getBBCodeColor($a) . "]", $string);
+				$string = str_replace(chr(3) . $a . ',' . $b, "[color=" . getBBCodeColor($b) . "]", $string);
 			}
 		}
 	}
+	$array = explode("\n", $string);
+	$count = substr_count($string, chr(15));
+	$string = "";
+	$color = false;
+	$bold = false;
+	$italic = false;
+	for ($a = 0; count($array) > $a; $a++) {
+		$length = strlen($array[$a]);
+		$temp = $array[$a];
+		$array[$a] = "";
+		for ($b = 0; $length > $b; $b++) {
+			if ($temp[$b] == "[") {
+				$check = $temp[$b + 1] . $temp[$b + 2] . $temp[$b + 3];
+				if ($check == "col") {
+					if ($color) {
+						$array[$a] .= "[/color]";
+					} else {
+						$color = true;
+					}
+					$array[$a] .= $temp[$b];
+				}
+			} else if ($temp[$b] == chr(3)) {
+				$color = true;
+				$array[$a] .= chr(3);
+			} else if ($temp[$b] == chr(2)) {
+				$bold = true;
+				$array[$a] .= "[b]";
+			} else if ($temp[$b] == chr(29)) {
+				$italic = true;
+				$array[$a] .= "[i]";
+			} else if ($temp[$b] == chr(15)) {
+				if ($color) {
+					$array[$a] .= "[/color]";
+					$color = false;
+				}
+				if ($bold) {
+					$array[$a] .= "[/b]";
+					$bold = false;
+				}
+				if ($italic) {
+					$array[$a] .= "[/i]";
+					$italic = false;
+				}
+			} else {
+				$array[$a] .= $temp[$b];
+			}
+		}
+		$string .= $array[$a] . "\n";
+	}	
+	$string = str_replace("<br>", "", $string); 
 	return $string;
 }
 
@@ -72,7 +125,7 @@ function getHTMLColor($id) {
 		case 8: 	return "yellow";
 		case 9: 	return "lime";
 		case 10: 	return "teal";
-		case 11: 	return "teal";
+		case 11: 	return "cyan";
 		case 12: 	return "blue";
 		case 13: 	return "pink";
 		case 14: 	return "grey";
@@ -94,7 +147,7 @@ function getBBCodeColor($id) {
 		case 8: 	return "yellow";
 		case 9: 	return "lime";
 		case 10: 	return "teal";
-		case 11: 	return "teal";
+		case 11: 	return "cyan";
 		case 12: 	return "blue";
 		case 13: 	return "pink";
 		case 14: 	return "grey";
@@ -116,7 +169,7 @@ function getIRCColor($id) {
 		case "yellow": 		return 8;
 		case "lime": 		return 9;
 		case "teal": 		return 10;
-		case "teal": 		return 11;
+		case "cyan": 		return 11;
 		case "blue": 		return 12;
 		case "pink": 		return 13;
 		case "grey": 		return 14;
